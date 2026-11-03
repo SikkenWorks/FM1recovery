@@ -11,3 +11,13 @@ FM1 Recovery by SikkenWorks 1.0k verification
 - The actual UAC token check and physical Windows/FM1 recovery need target testing.
 
 1.0k: Simple Mode About window opens, remains visible, and preserves the active recovery step. Shared credits builder used in both modes. Wizard transition/layout harness passes again; payload unchanged.
+
+Repository revision (2026-11-03):
+- Licenses viewer reads embedded THIRD_PARTY_NOTICES.txt, independent of payload extraction.
+- Both Windows build routes embed the notices.
+- Updated C# application compiled successfully with Mono/.NET Framework-compatible references.
+- Workflow YAML parsed and release/publish dependency and permissions checked.
+- Release publish job downloads the successful build artifact from the same run.
+- All supplied project files retained; payload and firmware byte-identical.
+- Local .git metadata excluded from upload ZIP.
+- Windows UI interaction and actual GitHub release publishing were not executed in this environment.

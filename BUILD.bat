@@ -7,7 +7,7 @@ if not exist "%FM1_CSC%" (
  pause
  exit /b 1
 )
-"%FM1_CSC%" /nologo /target:winexe /platform:x64 /optimize+ /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /win32manifest:app.manifest /win32icon:app.ico /resource:app.ico,branding.ico /resource:payload.zip,payload.zip /out:FM1-Recovery-by-SikkenWorks-1.0k.exe RecoveryApp.cs
+"%FM1_CSC%" /nologo /target:winexe /platform:x64 /optimize+ /r:System.Windows.Forms.dll /r:System.Drawing.dll /r:System.IO.Compression.dll /r:System.IO.Compression.FileSystem.dll /win32manifest:app.manifest /win32icon:app.ico /resource:app.ico,branding.ico /resource:payload.zip,payload.zip /resource:THIRD_PARTY_NOTICES.txt,THIRD_PARTY_NOTICES.txt /out:FM1-Recovery-by-SikkenWorks-1.0k.exe RecoveryApp.cs
 if errorlevel 1 exit /b 1
 echo Build complete.
 pause

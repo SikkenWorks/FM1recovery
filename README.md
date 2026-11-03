@@ -151,3 +151,21 @@ Keep these notices when redistributing the application or source. Repository lin
 The application has automated recovery-engine and interface checks. The earlier command-line recovery workflow was confirmed working on the developer's FM1. A physical Windows/FM1 recovery test of this particular GUI release has not been confirmed here.
 
 FM1 Recovery by SikkenWorks is an independent project. It is not affiliated with or endorsed by M-VAVE or the credited projects and contributors. Credit acknowledges their work; it does not imply their endorsement of this application.
+
+## Building and publishing with GitHub Actions
+
+The workflow in `.github/workflows/build.yml` builds the Windows application on pushes, pull requests, manual runs and newly published releases. The application icon, recovery payload and full third-party license notices are embedded in the executable. The Licenses button works in both modes without waiting for recovery tools to be extracted.
+
+To publish a version:
+
+1. Commit and push the complete updated source, including `.github/workflows/build.yml`.
+2. Open **Releases → Draft a new release** on GitHub.
+3. Create a new version tag pointing to the commit you want to release. The tagged commit must contain this workflow and the updated source.
+4. Enter a title and release notes, then click **Publish release**.
+5. Wait for **Build FM1 Recovery** to finish successfully in Actions. The publish job attaches the compiled executable, README and third-party notices to that release's **Assets**.
+
+Ordinary pushes and manual runs produce an Actions artifact, not a public release. Previously published releases are not rebuilt automatically. A failed build prevents the publish job from running. Existing assets with the same filenames are replaced; other assets and release notes are preserved. The publishing job alone receives `contents: write` permission.
+
+For local builds, run `BUILD.bat` on Windows. Keep `THIRD_PARTY_NOTICES.txt` beside the source when compiling. It is embedded by both build routes.
+
+When uploading this repository from the revised ZIP, copy the contents of `FM1recovery`, including the `.github` folder, into the repository root. The ZIP excludes local Git history and configuration (`.git`); all supplied project files are retained.

@@ -4,6 +4,8 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  release:
+    types: [published]
 
 permissions:
   contents: read
@@ -40,6 +42,7 @@ jobs:
             "/win32icon:app.ico"
             "/resource:app.ico,branding.ico"
             "/resource:payload.zip,payload.zip"
+            "/resource:THIRD_PARTY_NOTICES.txt,THIRD_PARTY_NOTICES.txt"
             "/out:dist/FM1-Recovery-by-SikkenWorks.exe"
             "RecoveryApp.cs"
           )
@@ -59,3 +62,33 @@ jobs:
           path: dist/
           if-no-files-found: error
           retention-days: 30
+
+  publish:
+    name: Attach compiled files to release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download compiled application from this run
+        uses: actions/download-artifact@v7
+        with:
+          name: FM1-Recovery-Windows
+          path: dist
+
+      - name: Upload compiled files to GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          $files = @(Get-ChildItem -Path dist -File | ForEach-Object { $_.FullName })
+          if ($files.Count -eq 0) {
+            throw "No compiled files found in dist."
+          }
+          gh release upload "$env:RELEASE_TAG" @files --clobber
+          if ($LASTEXITCODE -ne 0) {
+            throw "Uploading release files failed."
+          }

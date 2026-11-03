@@ -207,7 +207,19 @@ class RecoveryForm:Form {
   Add(t,Label("u/acrawf1 - original USB unbricking guide and firmware extraction script.\nu/International-Soup24 - early detection and flash dumping with jl-uboot-tool.\nLeo Kuroshita (kurogedelic) / Hugelton Instruments - Felucca package/flash documentation and FM-1 Transporter.\nGoodPerson42 - FM1-Unbricking-For-Dummies guide.",10,ink),115);
   Add(t,Label("Included components",14,ink),36);
   Add(t,Label("Official V15 firmware - M-VAVE.\nCPython 3.14 - Python Software Foundation and contributors.\nThird-party dependencies retain their original licenses and notices.\nThis is an independent recovery application; it is not affiliated with or endorsed by M-VAVE or the credited projects.",10,Color.Silver),100);
-  var licenses=Button("Open licenses / credits");licenses.Click+=(s,e)=>{if(String.IsNullOrEmpty(payload)){MessageBox.Show("The built-in tools are still being prepared. Please try again shortly.","Licenses and credits");return;}try{Process.Start(new ProcessStartInfo{FileName=Path.Combine(payload,"CREDITS.txt"),UseShellExecute=true});}catch(Exception ex){Append(ex.Message);}};Add(t,licenses,48);
+  var licenses=Button("Open licenses / credits");
+  licenses.Click+=(s,e)=>{
+   try{
+    using(var stream=Assembly.GetExecutingAssembly().GetManifestResourceStream("THIRD_PARTY_NOTICES.txt")){
+     if(stream==null)throw new InvalidOperationException("The embedded license information is missing. Please rebuild with THIRD_PARTY_NOTICES.txt included.");
+     using(var reader=new StreamReader(stream))
+     using(var window=new Form{Text="Licenses and credits",Icon=Icon,Size=new Size(800,640),MinimumSize=new Size(480,320),StartPosition=FormStartPosition.CenterParent,BackColor=bg,ForeColor=ink,Font=Font,AutoScaleMode=AutoScaleMode.Dpi,MinimizeBox=false}){
+      var text=new TextBox{Dock=DockStyle.Fill,Multiline=true,ReadOnly=true,ScrollBars=ScrollBars.Both,WordWrap=false,BackColor=bg,ForeColor=ink,Font=new Font("Consolas",10),Text=reader.ReadToEnd()};
+      window.Controls.Add(text);window.ShowDialog(p.FindForm());
+     }
+    }
+   }catch(Exception ex){MessageBox.Show(p.FindForm(),"Unable to open license information.\n\n"+ex.Message,"Licenses and credits",MessageBoxButtons.OK,MessageBoxIcon.Error);}
+  };Add(t,licenses,48);
  }
  void Prepare(){
   StartupLog.Write("Unpacking embedded payload.");Directory.CreateDirectory(storage);payload=Path.Combine(storage,"tools-1.0k-"+PayloadHash.Substring(0,12));
