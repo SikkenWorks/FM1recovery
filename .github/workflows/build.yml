@@ -1,0 +1,61 @@
+name: Build FM1 Recovery
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Download source
+        uses: actions/checkout@v7
+
+      - name: Compile Windows application
+        shell: pwsh
+        run: |
+          $compiler = Join-Path $env:WINDIR "Microsoft.NET\Framework64\v4.0.30319\csc.exe"
+
+          if (!(Test-Path $compiler)) {
+            throw ".NET Framework C# compiler not found."
+          }
+
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+
+          $compilerArguments = @(
+            "/nologo"
+            "/target:winexe"
+            "/platform:x64"
+            "/optimize+"
+            "/reference:System.Windows.Forms.dll"
+            "/reference:System.Drawing.dll"
+            "/reference:System.IO.Compression.dll"
+            "/reference:System.IO.Compression.FileSystem.dll"
+            "/win32manifest:app.manifest"
+            "/win32icon:app.ico"
+            "/resource:app.ico,branding.ico"
+            "/resource:payload.zip,payload.zip"
+            "/out:dist/FM1-Recovery-by-SikkenWorks.exe"
+            "RecoveryApp.cs"
+          )
+
+          & $compiler @compilerArguments
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Compilation failed."
+          }
+
+          Copy-Item README.md, THIRD_PARTY_NOTICES.txt -Destination dist
+
+      - name: Upload compiled application
+        uses: actions/upload-artifact@v7
+        with:
+          name: FM1-Recovery-Windows
+          path: dist/
+          if-no-files-found: error
+          retention-days: 30
