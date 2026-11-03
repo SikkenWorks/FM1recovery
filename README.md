@@ -169,3 +169,13 @@ Ordinary pushes and manual runs produce an Actions artifact, not a public releas
 For local builds, run `BUILD.bat` on Windows. Keep `THIRD_PARTY_NOTICES.txt` beside the source when compiling. It is embedded by both build routes.
 
 When uploading this repository from the revised ZIP, copy the contents of `FM1recovery`, including the `.github` folder, into the repository root. The ZIP excludes local Git history and configuration (`.git`); all supplied project files are retained.
+
+## Uploading a build to an existing release
+
+1. Commit this updated `.github/workflows/build.yml` to the default branch.
+2. Open Actions > Build FM1 Recovery > Run workflow. Select the default branch.
+3. Enter the exact existing release tag in `release_tag`, including capitalization (for example `V1.0k`).
+4. Click Run workflow. Both build and Attach compiled files to release must succeed.
+5. Refresh that release. The compiled executable, README and notices appear under Assets.
+
+The manual release build checks out the selected tag, so the binary matches that release's source. Updating main does not change old tags. Choose a new tag on updated code if you need the latest fixes. Leave release_tag empty to build only. A rerun of an old push run retains its original event and does not upload; use Run workflow for this new option. New published releases still trigger automatic builds. Same-name assets are replaced. No release is created or tag moved by the manual upload.

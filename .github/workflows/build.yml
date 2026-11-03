@@ -4,6 +4,12 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Existing release tag to build and upload (e.g. V1.0k). Leave empty for build only.'
+        required: false
+        type: string
+        default: ''
   release:
     types: [published]
 
@@ -17,6 +23,21 @@ jobs:
     steps:
       - name: Download source
         uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag || github.ref }}
+
+      - name: Check selected release exists
+        if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
+        run: |
+          gh release view "$env:RELEASE_TAG"
+          if ($LASTEXITCODE -ne 0) {
+            throw "Release '$env:RELEASE_TAG' was not found. Enter its exact existing tag."
+          }
 
       - name: Compile Windows application
         shell: pwsh
@@ -65,14 +86,14 @@ jobs:
 
   publish:
     name: Attach compiled files to release
-    if: github.event_name == 'release'
+    if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
     needs: build
     runs-on: windows-latest
     permissions:
       contents: write
     steps:
       - name: Download compiled application from this run
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: FM1-Recovery-Windows
           path: dist
@@ -82,7 +103,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
         run: |
           $files = @(Get-ChildItem -Path dist -File | ForEach-Object { $_.FullName })
           if ($files.Count -eq 0) {

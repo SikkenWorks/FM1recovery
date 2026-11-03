@@ -21,3 +21,5 @@ Repository revision (2026-11-03):
 - All supplied project files retained; payload and firmware byte-identical.
 - Local .git metadata excluded from upload ZIP.
 - Windows UI interaction and actual GitHub release publishing were not executed in this environment.
+
+Release workflow revision: optional manual release_tag input, exact tag checkout, release existence check, and conditional upload added. YAML parsed and expressions checked locally; remote GitHub execution not tested.
