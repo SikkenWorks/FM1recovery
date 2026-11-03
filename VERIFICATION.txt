@@ -1,0 +1,13 @@
+FM1 Recovery by SikkenWorks 1.0k verification
+- Windows x64 executable compiled; asInvoker manifest embedded.
+- Recovery payload byte-identical to 1.0i (firmware, loader, detection and flash).
+- WinForms wizard tested with mocked read-only inventory and recovery results:
+  startup choice, non-admin refusal in Simple Mode, administrator confirmation,
+  connection step, no-device wait, multiple-device refusal, unique-device ready,
+  exact RESTORE gate, verified success, failure, and Advanced Mode transition.
+- Seven wizard screens checked under Mono/Xvfb at 980x900 and 800x680 with
+  100/125/150/200 scaling. No overlapping visible flow/table components.
+- Screenshots visually reviewed for administrator and restore steps.
+- The actual UAC token check and physical Windows/FM1 recovery need target testing.
+
+1.0k: Simple Mode About window opens, remains visible, and preserves the active recovery step. Shared credits builder used in both modes. Wizard transition/layout harness passes again; payload unchanged.
