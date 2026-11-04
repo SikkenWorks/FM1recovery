@@ -152,30 +152,4 @@ The application has automated recovery-engine and interface checks. The earlier 
 
 FM1 Recovery by SikkenWorks is an independent project. It is not affiliated with or endorsed by M-VAVE or the credited projects and contributors. Credit acknowledges their work; it does not imply their endorsement of this application.
 
-## Building and publishing with GitHub Actions
-
-The workflow in `.github/workflows/build.yml` builds the Windows application on pushes, pull requests, manual runs and newly published releases. The application icon, recovery payload and full third-party license notices are embedded in the executable. The Licenses button works in both modes without waiting for recovery tools to be extracted.
-
-To publish a version:
-
-1. Commit and push the complete updated source, including `.github/workflows/build.yml`.
-2. Open **Releases → Draft a new release** on GitHub.
-3. Create a new version tag pointing to the commit you want to release. The tagged commit must contain this workflow and the updated source.
-4. Enter a title and release notes, then click **Publish release**.
-5. Wait for **Build FM1 Recovery** to finish successfully in Actions. The publish job attaches the compiled executable, README and third-party notices to that release's **Assets**.
-
-Ordinary pushes and manual runs produce an Actions artifact, not a public release. Previously published releases are not rebuilt automatically. A failed build prevents the publish job from running. Existing assets with the same filenames are replaced; other assets and release notes are preserved. The publishing job alone receives `contents: write` permission.
-
-For local builds, run `BUILD.bat` on Windows. Keep `THIRD_PARTY_NOTICES.txt` beside the source when compiling. It is embedded by both build routes.
-
-When uploading this repository from the revised ZIP, copy the contents of `FM1recovery`, including the `.github` folder, into the repository root. The ZIP excludes local Git history and configuration (`.git`); all supplied project files are retained.
-
-## Uploading a build to an existing release
-
-1. Commit this updated `.github/workflows/build.yml` to the default branch.
-2. Open Actions > Build FM1 Recovery > Run workflow. Select the default branch.
-3. Enter the exact existing release tag in `release_tag`, including capitalization (for example `V1.0k`).
-4. Click Run workflow. Both build and Attach compiled files to release must succeed.
-5. Refresh that release. The compiled executable, README and notices appear under Assets.
-
-The manual release build checks out the selected tag, so the binary matches that release's source. Updating main does not change old tags. Choose a new tag on updated code if you need the latest fixes. Leave release_tag empty to build only. A rerun of an old push run retains its original event and does not upload; use Run workflow for this new option. New published releases still trigger automatic builds. Same-name assets are replaced. No release is created or tag moved by the manual upload.
+ng main does not change old tags. Choose a new tag on updated code if you need the latest fixes. Leave release_tag empty to build only. A rerun of an old push run retains its original event and does not upload; use Run workflow for this new option. New published releases still trigger automatic builds. Same-name assets are replaced. No release is created or tag moved by the manual upload.
