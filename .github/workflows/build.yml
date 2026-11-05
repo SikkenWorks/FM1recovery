@@ -76,16 +76,23 @@ jobs:
 
           Copy-Item README.md, THIRD_PARTY_NOTICES.txt -Destination dist
 
+      - name: Package Windows recovery ZIP
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Path package -Force | Out-Null
+          Compress-Archive -Path dist/* -DestinationPath package/FM1-Recovery-Windows.zip -Force
+
       - name: Upload compiled application
         uses: actions/upload-artifact@v7
         with:
           name: FM1-Recovery-Windows
-          path: dist/
+          path: package/FM1-Recovery-Windows.zip
           if-no-files-found: error
           retention-days: 30
 
   publish:
-    name: Attach compiled files to release
+    name: Attach Windows recovery ZIP to release
     if: github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')
     needs: build
     runs-on: windows-latest
@@ -96,20 +103,20 @@ jobs:
         uses: actions/download-artifact@v8
         with:
           name: FM1-Recovery-Windows
-          path: dist
+          path: package
 
-      - name: Upload compiled files to GitHub Release
+      - name: Upload Windows recovery ZIP to GitHub Release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.event.release.tag_name || inputs.release_tag }}
         run: |
-          $files = @(Get-ChildItem -Path dist -File | ForEach-Object { $_.FullName })
-          if ($files.Count -eq 0) {
-            throw "No compiled files found in dist."
+          $files = @(Get-ChildItem -Path package -Filter *.zip -File | ForEach-Object { $_.FullName })
+          if ($files.Count -ne 1) {
+            throw "Expected exactly one Windows recovery ZIP in package."
           }
           gh release upload "$env:RELEASE_TAG" @files --clobber
           if ($LASTEXITCODE -ne 0) {
-            throw "Uploading release files failed."
+            throw "Uploading release ZIP failed."
           }
